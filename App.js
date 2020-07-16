@@ -1,7 +1,11 @@
 import {StatusBar} from 'expo-status-bar';
 import React, {useState, useEffect, useRef} from 'react';
-import {Alert, StyleSheet, Text, View, FlatList, Modal, TextInput, TouchableOpacity, BackHandler} from 'react-native';
+import {YellowBox,Alert, StyleSheet, Text, View, FlatList, Modal, TextInput, TouchableOpacity, BackHandler} from 'react-native';
 import uuid from 'uuid-random';
+import Firebase from "firebase";
+import db from './api/firebase'
+
+YellowBox.ignoreWarnings(['Setting a timer']);
 
 import Header from "./components/Header";
 import InputBox from "./components/InputBox";
@@ -20,12 +24,23 @@ export default function App() {
     const textInputRef = useRef();
 
     useEffect(() => {
-        datafetch().then(value => {
-            setItems(value.reverse());
-            setLoading(false);
+        db.collection('chatting').get()
+            .then((snapshot)=>{
+                snapshot.forEach(doc => {
+                    setItems(doc.data().chats);
+                })
+            })
+        setLoading(false);
+        const subscriber = db.collection('chatting')
+            .onSnapshot((snapshot)=>{
+                snapshot.forEach(doc => {
+                    setItems(doc.data().chats);
+                })
         })
+        return ()=>subscriber();
 
     }, []);
+
     useEffect(()=>{
         const backAction = () => {
             Alert.alert(`Do you want to re-enter your name?`, '' ,[
@@ -33,7 +48,6 @@ export default function App() {
                     text: 'Ok',
                     onPress: ()=>{
                         setName('');
-                        console.log('nameLoading',nameLoading);
                         setNameLoading(true)
                     },
                 },
@@ -63,14 +77,14 @@ export default function App() {
             setNameLoading(false);
         }
     }
+
     const onClickEvent = (text) => () => {
         if (text) {
             let edit = {id: uuid(), name: name, message: text}
-            dataadd(edit).then(value => {
-                let data = Array.prototype.slice.call(value);
-                setItems(data.reverse());
-                setRefresh(!refresh);
-            })
+            // setItems([edit,...items]);
+            const upload = async ()=>{
+                await db.collection('chatting').doc('chatting').update({chats: [edit,...items]})}
+            upload()
             textInputRef.current.clear();
         }
     }

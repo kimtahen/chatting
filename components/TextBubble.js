@@ -2,7 +2,8 @@ import React from 'react';
 import {StyleSheet, Text, View,} from 'react-native';
 
 export default function TextBubble({item, myname}) {
-    if (item === myname) {
+    console.log(item.name,myname);
+    if (item.name !== myname) {
         return (
             <View style={{...styles.container, justifyContent: 'flex-start'}}>
                 <Text numberOfLines={1} style={styles.text}>{item.name}</Text>

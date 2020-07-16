@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@react-native-community/blur": "^3.6.0",
+    "@react-native-firebase/app": "^8.2.0",
     "expo": "~38.0.8",
     "expo-blur": "^8.1.2",
     "expo-status-bar": "^1.0.2",
